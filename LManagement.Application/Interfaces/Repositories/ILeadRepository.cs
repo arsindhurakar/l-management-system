@@ -1,10 +1,11 @@
-﻿using LManagement.Domain.Entities;
+﻿using LManagement.Application.Models.Pagination;
+using LManagement.Domain.Entities;
 
 namespace LManagement.Infrastructure.Repositories.Interfaces
 {
     public interface ILeadRepository
     {
-        Task<IEnumerable<Lead>> GetAllAsync();
+        Task<PagedResult<Lead>> GetAllAsync(PageRequest pageRequest);
         Task<Lead?> GetByIdAsync(int id);
         Task<Lead> CreateAsync(Lead lead);
         Task<Lead> UpdateAsync(Lead lead);

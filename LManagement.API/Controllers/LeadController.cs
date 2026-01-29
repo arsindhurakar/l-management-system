@@ -1,6 +1,8 @@
 ﻿using LManagement.API.Models;
+using LManagement.API.Extensions;
 using LManagement.Application.DTOs.LeadDtos;
 using LManagement.Application.Interfaces.Services;
+using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,10 +23,11 @@ namespace LManagement.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<Lead>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Lead>>>> GetLeads()
+        public async Task<ActionResult<ApiResponse<IEnumerable<Lead>>>> GetLeads(
+            [FromQuery] PageRequest pageRequest)
         {
-            var leads = await _leadService.GetAllLeadsAsync() ?? new List<Lead>();
-            bool hasLeads = leads.Any();
+            var pagedResult = await _leadService.GetAllLeadsAsync(pageRequest);
+            bool hasLeads = pagedResult.Items.Any();
             string message = hasLeads ? "Leads fetched successfully." : "No leads found.";
 
             if (!hasLeads)
@@ -32,12 +35,7 @@ namespace LManagement.API.Controllers
                 _logger.LogInformation(message);
             }
 
-            return Ok(new ApiResponse<IEnumerable<Lead>>
-            {
-                Success = true,
-                Message = message,
-                Data = leads,
-            });
+            return Ok(pagedResult.ToPaginationResponse(message));
         }
 
         [HttpGet("{id}")]
