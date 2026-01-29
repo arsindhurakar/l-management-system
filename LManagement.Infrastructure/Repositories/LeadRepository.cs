@@ -1,4 +1,6 @@
-﻿using LManagement.Domain.Entities;
+﻿using LManagement.Application.Handlers;
+using LManagement.Application.Models.Pagination;
+using LManagement.Domain.Entities;
 using LManagement.Infrastructure.Data;
 using LManagement.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +16,11 @@ namespace LManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Lead>> GetAllAsync()
+        public async Task<PagedResult<Lead>> GetAllAsync(PageRequest pageRequest)
         {
             return await _context.Leads
                 .OrderByDescending(lead => lead.CreatedAt)
-                .ToListAsync();
+                .PaginateAsync(pageRequest);
         }
 
         public async Task<Lead?> GetByIdAsync(int id)

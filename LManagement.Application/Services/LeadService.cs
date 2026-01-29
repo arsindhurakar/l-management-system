@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LManagement.Application.DTOs.LeadDtos;
 using LManagement.Application.Interfaces.Services;
+using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 using LManagement.Infrastructure.Repositories.Interfaces;
 
@@ -17,9 +18,9 @@ namespace LManagement.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Lead>> GetAllLeadsAsync()
+        public async Task<PagedResult<Lead>> GetAllLeadsAsync(PageRequest pageRequest)
         {
-            return await _leadRepository.GetAllAsync();
+            return await _leadRepository.GetAllAsync(pageRequest);
         }
 
         public async Task<Lead?> GetLeadByIdAsync(int id)
