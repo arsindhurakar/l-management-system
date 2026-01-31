@@ -2,6 +2,7 @@
 using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 using LManagement.Infrastructure.Data;
+using LManagement.Infrastructure.Extensions;
 using LManagement.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ namespace LManagement.Infrastructure.Repositories
         public async Task<PagedResult<Lead>> GetAllAsync(PageRequest pageRequest)
         {
             return await _context.Leads
-                .OrderByDescending(lead => lead.CreatedAt)
+                .ApplySorting(pageRequest)
                 .PaginateAsync(pageRequest);
         }
 
