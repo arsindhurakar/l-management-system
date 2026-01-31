@@ -1,4 +1,4 @@
-﻿using LManagement.API.Models;
+﻿using LManagement.API.Models.Responses;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace LManagement.API.Middlewares

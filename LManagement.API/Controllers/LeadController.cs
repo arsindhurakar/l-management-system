@@ -1,10 +1,13 @@
-﻿using LManagement.API.Models;
-using LManagement.API.Extensions;
+﻿using LManagement.API.Extensions;
 using LManagement.Application.DTOs.LeadDtos;
 using LManagement.Application.Interfaces.Services;
 using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using LManagement.API.Models.Responses;
+using LManagement.Infrastructure.Providers;
+using LManagement.Application.Interfaces;
+using LManagement.Application.Dtos;
 
 namespace LManagement.API.Controllers
 {
@@ -14,18 +17,28 @@ namespace LManagement.API.Controllers
     {
         private readonly ILeadService _leadService;
         private readonly ILogger<LeadController> _logger;
+        private readonly ISortFieldsProvider _sortFieldsProvider;
 
-        public LeadController(ILeadService leadService, ILogger<LeadController> logger)
+        public LeadController(ILeadService leadService, ILogger<LeadController> logger, ISortFieldsProvider sortFieldsProvider)
         {
             _leadService = leadService;
             _logger = logger;
+            _sortFieldsProvider = sortFieldsProvider;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<Lead>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Lead>>>> GetLeads(
-            [FromQuery] PageRequest pageRequest)
+        [ProducesResponseType(typeof(PaginatedApiResponse<IEnumerable<Lead>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PaginatedApiResponse<IEnumerable<Lead>>>> GetLeads(
+            [FromQuery] PageRequestDto pageRequestDto)
         {
+            var validFields = _sortFieldsProvider.GetSortFields<Lead>();
+            var pageRequest = new PageRequest(validFields)
+            {
+                Page = pageRequestDto.Page,
+                PageSize = pageRequestDto.PageSize,
+                SortBy = pageRequestDto.SortBy,
+                SortOrder = pageRequestDto.SortOrder
+            };
             var pagedResult = await _leadService.GetAllLeadsAsync(pageRequest);
             bool hasLeads = pagedResult.Items.Any();
             string message = hasLeads ? "Leads fetched successfully." : "No leads found.";
@@ -49,99 +62,40 @@ namespace LManagement.API.Controllers
             {
                 _logger.LogInformation("Lead with ID {LeadId} not found.", id);
 
-                return NotFound(new ApiResponse<Lead>
-                {
-                    Success = false,
-                    Message = "No lead found.",
-                    Data = null
-                });
+                return NotFound(ApiResponse<Lead>.FailResponse("No lead found."));
             }
 
-            return Ok(new ApiResponse<Lead>
-            {
-                Success = true,
-                Message = "Lead fetched successfully.",
-                Data = lead
-            });
+            return Ok(ApiResponse<Lead>.SuccessResponse(lead, "Lead fetched successfully"));
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<Lead>), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiErrorResponse<Lead>), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ApiResponse<Lead>>> CreateLead([FromBody] LeadCreateDto leadCreateDto)
         {
-            if (!ModelState.IsValid)
-            {
-                var errorMessages = ModelState.Values
-                    .SelectMany(value => value.Errors)
-                    .Select(error => error.ErrorMessage)
-                    .ToList();
-
-                _logger.LogWarning("CreateLead validation failed. Errors: {Errors}", errorMessages);
-
-                return BadRequest(new ApiResponse<Lead>
-                {
-                    Success = false,
-                    Message = "Lead data is invalid.",
-                    Data = null,
-                    Errors = errorMessages
-                });
-            }
-
             var createdLead = await _leadService.CreateLeadAsync(leadCreateDto);
 
-            return CreatedAtAction(nameof(GetLeadById), new { id = createdLead.Id }, new ApiResponse<Lead>
-            {
-                Success = true,
-                Message = "Lead created successfully.",
-                Data = createdLead
-            });
+            return CreatedAtAction(nameof(GetLeadById), new { id = createdLead.Id }, ApiResponse<Lead>
+                .SuccessResponse(createdLead, "Lead created successfully."));
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ApiResponse<Lead>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiErrorResponse<Lead>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ApiResponse<Lead>>> UpdateLead(int id, [FromBody] LeadUpdateDto leadUpdateDto)
         {
-            if (!ModelState.IsValid)
-            {
-                var errorMessages = ModelState.Values
-                    .SelectMany(value => value.Errors)
-                    .Select(error => error.ErrorMessage)
-                    .ToList();
-
-                _logger.LogWarning("UpdateLead validation failed. Errors: {Errors}", errorMessages);
-
-                return BadRequest(new ApiResponse<Lead>
-                {
-                    Success = false,
-                    Message = "Lead data is invalid.",
-                    Data = null,
-                    Errors = errorMessages
-                });
-            }
-
             var lead = await _leadService.UpdateLeadAsync(id, leadUpdateDto);
 
             if (lead == null)
             {
                 _logger.LogInformation("Lead with ID {LeadId} not found for update.", id);
 
-                return NotFound(new ApiResponse<Lead>
-                {
-                    Success = false,
-                    Message = "Lead not found.",
-                    Data = null
-                });
+                return NotFound(ApiResponse<Lead>.FailResponse("Lead not found."));
             }
+          
+            return Ok(ApiResponse<Lead>.SuccessResponse(lead, "Lead updated successfully"));
 
-            return Ok(new ApiResponse<Lead>
-            {
-                Success = true,
-                Message = "Lead updated successfully.",
-                Data = lead
-            });
         }
 
         [HttpDelete("{id}")]
@@ -155,20 +109,10 @@ namespace LManagement.API.Controllers
             {
                 _logger.LogInformation("Lead with ID {LeadId} not found for deletion.", id);
 
-                return NotFound(new ApiResponse<bool>
-                {
-                    Success = false,
-                    Message = "Lead not found.",
-                    Data = false
-                });
+                return NotFound(ApiResponse<Lead>.FailResponse("Lead not found."));
             }
 
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Lead deleted successfully.",
-                Data = true
-            });
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Lead deleted successfully"));
         }
     }
 }
