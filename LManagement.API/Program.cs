@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using LManagement.Infrastructure.Data;
-using LManagement.Infrastructure.Repositories.Interfaces;
 using LManagement.Infrastructure.Repositories;
 using LManagement.Application.Interfaces.Services;
 using LManagement.Application.Services;
 using LManagement.API.Middlewares;
+using DotNetEnv;
+using LManagement.Application.Interfaces.Repositories;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 

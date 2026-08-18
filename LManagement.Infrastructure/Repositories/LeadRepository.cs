@@ -1,8 +1,8 @@
 ﻿using LManagement.Application.Handlers;
+using LManagement.Application.Interfaces.Repositories;
 using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 using LManagement.Infrastructure.Data;
-using LManagement.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LManagement.Infrastructure.Repositories
@@ -50,7 +50,8 @@ namespace LManagement.Infrastructure.Repositories
         {
             var lead = await _context.Leads.FindAsync(id);
 
-            if (lead == null) {
+            if (lead == null)
+            {
                 return false;
             }
 

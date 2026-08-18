@@ -13,4 +13,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LManagement.Domain\LManagement.Domain.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="DTOs/UserDtos/" />
+	</ItemGroup>
 </Project>

@@ -20,7 +20,7 @@ namespace LManagement.API.Middlewares
                         var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
                         logger.LogError(contextFeature.Error, "Unhandled exception occurred.");
 
-                        var errorResponse = new ApiResponse<object>
+                        var errorResponse = new ApiPagedResponse<object>
                         {
                             Success = false,
                             Message = "An unexpected error occurred. Please try again later.",

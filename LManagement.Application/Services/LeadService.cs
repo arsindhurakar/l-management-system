@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using LManagement.Application.DTOs.LeadDtos;
+using LManagement.Application.Interfaces.Repositories;
 using LManagement.Application.Interfaces.Services;
 using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
-using LManagement.Infrastructure.Repositories.Interfaces;
+
 
 namespace LManagement.Application.Services
 {

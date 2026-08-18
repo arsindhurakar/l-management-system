@@ -5,11 +5,11 @@ namespace LManagement.API.Extensions
 {
     public static class ApiResponseExtensions
     {
-        public static ApiResponse<IEnumerable<T>> ToPaginationResponse<T>(
+        public static ApiPagedResponse<IEnumerable<T>> ToPaginationResponse<T>(
             this PagedResult<T> pagedResult,
             string message = "Data retrieved successfully")
         {
-            return new ApiResponse<IEnumerable<T>>
+            return new ApiPagedResponse<IEnumerable<T>>
             {
                 Success = true,
                 Message = message,
@@ -25,6 +25,6 @@ namespace LManagement.API.Extensions
                 }
             };
         }
-       
+
     }
 }

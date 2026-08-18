@@ -22,8 +22,8 @@ namespace LManagement.API.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<Lead>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Lead>>>> GetLeads(
+        [ProducesResponseType(typeof(ApiPagedResponse<IEnumerable<Lead>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiPagedResponse<IEnumerable<Lead>>>> GetLeads(
             [FromQuery] PageRequest pageRequest)
         {
             var pagedResult = await _leadService.GetAllLeadsAsync(pageRequest);
@@ -90,7 +90,7 @@ namespace LManagement.API.Controllers
 
             var createdLead = await _leadService.CreateLeadAsync(leadCreateDto);
 
-            return CreatedAtAction(nameof(GetLeadById), new { id = createdLead.Id }, new ApiResponse<Lead>
+            return CreatedAtAction(nameof(GetLeadById), new { id = createdLead.Id }, new ApiPagedResponse<Lead>
             {
                 Success = true,
                 Message = "Lead created successfully.",

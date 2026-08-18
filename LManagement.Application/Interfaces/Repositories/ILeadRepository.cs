@@ -1,7 +1,7 @@
 ﻿using LManagement.Application.Models.Pagination;
 using LManagement.Domain.Entities;
 
-namespace LManagement.Infrastructure.Repositories.Interfaces
+namespace LManagement.Application.Interfaces.Repositories
 {
     public interface ILeadRepository
     {

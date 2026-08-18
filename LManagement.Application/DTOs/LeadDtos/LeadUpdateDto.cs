@@ -14,8 +14,10 @@ namespace LManagement.Application.DTOs.LeadDtos
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "Phone Number is required.")]
-        [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone Number must contain only 10 digits.")]
+        [RegularExpression(@"^(98|97|96)[0-9]{8}$",
+            ErrorMessage = "Phone Number is invalid.")]
         public string PhoneNumber { get; set; } = string.Empty;
+
         public string? Company { get; set; }
     }
 }
